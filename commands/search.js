@@ -3,7 +3,6 @@ const { AttachmentBuilder } = require('discord.js');
 const axios = require('axios');
 
 const fs = require('fs');
-const path = require('node:path');
 
 const globalData = require('../global/data');
 
@@ -67,7 +66,7 @@ module.exports = {
                             console.error(`Failed to send image: ${path}`, err);
                         }
         
-                        await new sleep(globalData.sendimageperDelay); // Delay per image
+                        await new sleep(globalData.sendImagePerDelay); // Delay per image
                     }
                 }
         

@@ -45,7 +45,7 @@ client.once('ready', async () => {
         console.log("✅ Bot is ready Login with " + client.user.username);
 
     // auto-run 'rrc' command every 5h
-    setInterval(autoRunCommand, globalData.autorandomroleDelay);
+    setInterval(autoRunCommand, globalData.autoRandomRoleDelay);
     });
 
 async function autoUpdate() {
@@ -87,6 +87,26 @@ client.on('interactionCreate', async (interaction) => {
             const results = filtered.map(artist => ({
                 name: `${artist.name} ${artist.service}`,
                 value: artist.id
+            }));
+
+            return interaction.respond(results).catch(() => {});
+        }
+
+        if (interaction.isAutocomplete() && interaction.commandName === "setglobalparameter") {
+            const focused = interaction.options.getFocused()?.toLowerCase() || '';
+
+            const mode = {
+                modeList: Object.keys(globalData)
+            }
+
+            const filtered = mode.modeList.filter(target =>
+                target.toLowerCase().startsWith(focused)
+            ).slice(0, 2);
+        
+
+            const results = filtered.map(mode => ({
+                name: `${mode}`,
+                value: mode
             }));
 
             return interaction.respond(results).catch(() => {});
