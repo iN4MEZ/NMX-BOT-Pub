@@ -36,7 +36,7 @@ module.exports = {
         // ฟังก์ชันสุ่มและจัดการ Role
         const assignRandomRoles = async () => {
             for (const roleId of uniqueRoleId) {
-                const membersWithRole = guild.members.cache.filter(member => member.roles.cache.has(roleId));
+                const membersWithRole = guild.members.cache.filter(member => member.roles.cache.has(roleId) && member.presence && member.presence.status === 'online');
                 for (const member of membersWithRole.values()) {
                     await member.roles.remove(roleId);
                     //interaction.channel.send(`🗑️ ลบ Role ${interaction.guild.roles.cache.get(roleId)} จาก ${member.user.tag}`);
