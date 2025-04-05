@@ -27,7 +27,7 @@ module.exports = {
 
         // โหลดสมาชิกทั้งหมด
         await await guild.members.fetch()
-        const members = guild.members.cache.filter(member => !member.user.bot && member.presence && member.presence.status === 'online'); // คัดเฉพาะสมาชิกที่ไม่ใช่บอท
+        const members = guild.members.cache.filter(member => !member.user.bot && member.presence); // คัดเฉพาะสมาชิกที่ไม่ใช่บอท
         if (members.size === 0) {
             interaction.channel.send("❌ ไม่มีสมาชิกในเซิร์ฟเวอร์");
             return;
@@ -36,7 +36,7 @@ module.exports = {
         // ฟังก์ชันสุ่มและจัดการ Role
         const assignRandomRoles = async () => {
             for (const roleId of uniqueRoleId) {
-                const membersWithRole = guild.members.cache.filter(member => member.roles.cache.has(roleId) && member.presence && member.presence.status === 'online');
+                const membersWithRole = guild.members.cache.filter(member => member.roles.cache.has(roleId));
                 for (const member of membersWithRole.values()) {
                     await member.roles.remove(roleId);
                     //interaction.channel.send(`🗑️ ลบ Role ${interaction.guild.roles.cache.get(roleId)} จาก ${member.user.tag}`);

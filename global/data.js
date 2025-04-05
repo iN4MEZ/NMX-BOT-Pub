@@ -1,4 +1,5 @@
 module.exports = {
-    autoRandomRoleDelay: 18000000,
-    sendImagePerDelay: 5000
+    autoRandomRoleDelay: 600000,
+    sendImagePerDelay: 5000,
+    enableLog: 0
 }

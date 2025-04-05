@@ -6,21 +6,21 @@ const data = new SlashCommandBuilder()
     .setName('setglobalparameter')
     .setDescription('set data')
     .addStringOption(option => option.setName('mode').setDescription('what your want to set').setRequired(true).setAutocomplete(true))
-    .addIntegerOption(option => option.setName('delay').setDescription('delay MS').setRequired(true))
+    .addIntegerOption(option => option.setName('parameter').setDescription('delay MS').setRequired(true))
 
 module.exports = {
     data,
     async execute({ client, interaction }) {
         var mode = interaction.options.get('mode').value;
-        var delay = interaction.options.get('delay').value;
+        var parameter = interaction.options.get('parameter').value;
 
         await interaction.deferReply();
 
         try {
             if(mode in globalData) {
-                await interaction.channel.send(`✅Changed Value Of Mode ${mode} From ${globalData[mode]} to ${delay}`);
+                await interaction.channel.send(`✅Changed Value Of Mode ${mode} From ${globalData[mode]} to ${parameter}`);
     
-                globalData[mode] = delay;
+                globalData[mode] = parameter;
     
             } else {
                 await interaction.channel.send(`❌ Parameter Not Found`);

@@ -28,8 +28,6 @@ module.exports = {
 
             if (!results) { return; }
 
-            //console.log(results[0].raw.data);
-
             results.forEach(async (source) => {
 
                 const found = source.raw.data;
@@ -39,8 +37,8 @@ module.exports = {
                 if (source.similarity > 90 && found != undefined) {
                     const sourceFoundEmbed = new EmbedBuilder()
                         .setColor(0x0099FF)
-                        .setTitle(found.author_name)
-                        .setURL(found.author_url)
+                        .setTitle(found.authorName)
+                        .setURL(found.authorUrl)
                         .setDescription("กดด้านบน ไอโง่")
                         .setThumbnail(source.thumbnail)
                         .addFields(
@@ -79,8 +77,8 @@ module.exports = {
                             .setTimestamp()
                             .setFooter({ text: 'Field Is gay' });
 
-                        await interaction.channel.send({ embeds: [firstIndex] });
-                        return;
+                            await interaction.channel.send({ embeds: [firstIndex] });
+                            return;
                         }
 
 

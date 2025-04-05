@@ -65,8 +65,10 @@ async function autoRunCommand() {
 
         await command.execute({ client, interaction: null });
 
-        const now = new Date(Date.now() + 7 * 60 * 60 * 1000);
-        await channel.send(`Automatic Randomize Role ${now.toUTCString()} Delay: ${globalData.autorandomroleDelay}`);
+        if(globalData.enableLog === 1) {
+            const now = new Date(Date.now() + 7 * 60 * 60 * 1000);
+            await channel.send(`Automatic Randomize Role ${now.toUTCString()} Delay: ${globalData.autorandomroleDelay}`);
+        }
     } catch (err) {
         console.error("❌ Auto command error:", err);
     }
