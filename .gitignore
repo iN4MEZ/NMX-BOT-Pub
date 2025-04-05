@@ -4,3 +4,4 @@
 .env.staging
 update.bat
 run.bat
+assets/data/artists.json
