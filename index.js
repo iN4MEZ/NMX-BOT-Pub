@@ -40,7 +40,7 @@ client.once('ready', async () => {
             { body: commandsData }
         );
 
-        //await autoUpdate();
+        await autoUpdate();
 
         console.log("✅ Bot is ready Login with " + client.user.username);
 
