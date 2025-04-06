@@ -103,7 +103,7 @@ client.on('interactionCreate', async (interaction) => {
 
             const filtered = mode.modeList.filter(target =>
                 target.toLowerCase().startsWith(focused)
-            ).slice(0, 2);
+            ).slice(0, mode.modeList.length);
         
 
             const results = filtered.map(mode => ({
