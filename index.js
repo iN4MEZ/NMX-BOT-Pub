@@ -60,7 +60,7 @@ async function autoRunCommand() {
         const command = commands.find(cmd => cmd.data.name === 'rrc');
         if (!command) return;
 
-        const channel = await client.channels.fetch('1358228500737298584');
+        const channel = await client.channels.fetch('1357120803203715083');
         if (!channel) return;
 
         await command.execute({ client, interaction: null });
