@@ -7,8 +7,7 @@ const data = new SlashCommandBuilder()
 module.exports = {
     data,
     async execute({ client, interaction }) {
-        const channel = await client.channels.fetch('1357120803203715083');
 
-        await channel.send("TEST!");
+        await interaction.channel.send("TEST!");
     }
 }
