@@ -4,6 +4,8 @@ const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const { GatewayIntentBits, Client } = require('discord.js');
 
+const { setTimeout: sleep } = require('timers/promises');
+
 const fs = require('fs');
 const path = require('node:path');
 
@@ -44,8 +46,15 @@ client.once('ready', async () => {
 
         console.log("✅ Bot is ready Login with " + client.user.username);
 
-    // auto-run 'rrc' command every 5h
-    setInterval(autoRunCommand, globalData.autoRandomRoleDelay);
+    // auto-run 'rrc' command
+    async function autoRunLoop() {
+        while (globalData.enableRRCLoop === 1) {
+            autoRunCommand();
+            await sleep(globalData.autoRandomRoleDelay);
+        }
+    }
+
+    await autoRunLoop();
     });
 
 async function autoUpdate() {
@@ -67,7 +76,7 @@ async function autoRunCommand() {
 
         if(globalData.enableLog === 1) {
             const now = new Date(Date.now() + 7 * 60 * 60 * 1000);
-            await channel.send(`Automatic Randomize Role ${now.toUTCString()} Delay: ${globalData.autorandomroleDelay}`);
+            await channel.send(`Automatic Randomize Role ${now.toUTCString()} Delay: ${globalData.autoRandomRoleDelay}`);
         }
     } catch (err) {
         console.error("❌ Auto command error:", err);
