@@ -128,4 +128,16 @@ client.on('interactionCreate', async (interaction) => {
 });
 
 client.on('error', (e) => console.error("Client Error:", e));
+
+const express = require("express");
+const app = express();
+const port = 3000;
+app.get('/', (req, res) => {
+    const imagePath = path.join(__dirname, 'index.html');
+    res.sendFile(imagePath);
+});
+app.listen(port, () => {
+    console.log(`🔗 Listening : http://localhost:${port}`);
+});
+
 client.login(process.env.TOKEN);
