@@ -59,7 +59,7 @@ client.riffy = new Riffy(client, nodes, {
 
 client.on("ready", () => {
     client.riffy.init(client.user.id);
-    console.log(`Logged in as ${client.user.tag}`);
+    console.log(`riffy was init!`);
 });
 
 client.riffy.on('nodeConnect', (node) => {
@@ -90,15 +90,15 @@ client.once('ready', async () => {
 
         console.log("✅ Bot is ready Login with " + client.user.username);
 
-    // // auto-run 'rrc' command
-    // async function autoRunLoop() {
-    //     while (globalData.enableRRCLoop == 1) {
-    //         autoRunCommand();
-    //         await sleep(globalData.autoRandomRoleDelay);
-    //     }
-    // }
+    // auto-run 'rrc' command
+    async function autoRunLoop() {
+        while (globalData.enableRRCLoop == 1) {
+            autoRunCommand();
+            await sleep(globalData.autoRandomRoleDelay);
+        }
+    }
 
-    //await autoRunLoop();
+    await autoRunLoop();
     });
 
 async function autoUpdate() {

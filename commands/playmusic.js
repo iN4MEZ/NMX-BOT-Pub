@@ -194,8 +194,6 @@ module.exports = {
                     }
                 }
 
-                console.log(player);
-
                 try {
                     const resolve = await client.riffy.resolve({
                         query,
