@@ -2,7 +2,12 @@ require('dotenv').config();
 
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
-const { GatewayIntentBits, Client } = require('discord.js');
+const { GatewayIntentBits, Client,GatewayDispatchEvents } = require('discord.js');
+
+const { DisTube } = require('distube');
+const { YtDlpPlugin } = require('@distube/yt-dlp');
+
+const { Riffy } = require('riffy');
 
 const { setTimeout: sleep } = require('timers/promises');
 
@@ -22,7 +27,47 @@ const client = new Client({
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildPresences,
+        GatewayIntentBits.GuildVoiceStates
     ]
+});
+
+client.distube = new DisTube(client, {
+    plugins: [
+        new YtDlpPlugin(),
+    ],
+});
+
+console.log('\x1b[35m[ MUSIC 1 ]\x1b[0m', '\x1b[32mDisTube Music System Active ✅\x1b[0m');
+
+const nodes = [
+    {
+        host: "ind1.zapto.org",
+        password: "yourpasswordhere",
+        port: 25575,
+        secure: false
+    }
+];
+
+client.riffy = new Riffy(client, nodes, {
+    send: (payload) => {
+        const guild = client.guilds.cache.get(payload.d.guild_id);
+        if (guild) guild.shard.send(payload);
+    },
+    defaultSearchPlatform: "ytmsearch",
+    restVersion: "v4", // Or "v3" based on your Lavalink version.
+});
+
+client.on("ready", () => {
+    client.riffy.init(client.user.id);
+    console.log(`Logged in as ${client.user.tag}`);
+});
+
+client.riffy.on('nodeConnect', (node) => {
+    console.log(`\x1b[34m[ LAVALINK CONNECTION ]\x1b[0m Node connected: \x1b[32m${node.name}\x1b[0m`);
+});
+
+client.riffy.on('nodeError', (node, error) => {
+    console.error(`\x1b[31m[ LAVALINK ]\x1b[0m Node \x1b[32m${node.name}\x1b[0m had an error: \x1b[33m${error.message}\x1b[0m`);
 });
 
 // 🔁 Load commands once
@@ -35,7 +80,6 @@ for (const file of fs.readdirSync(commandsPath)) {
 }
 
 client.once('ready', async () => {
-
     const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
         await rest.put(
             Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
@@ -46,15 +90,15 @@ client.once('ready', async () => {
 
         console.log("✅ Bot is ready Login with " + client.user.username);
 
-    // auto-run 'rrc' command
-    async function autoRunLoop() {
-        while (globalData.enableRRCLoop === 1) {
-            autoRunCommand();
-            await sleep(globalData.autoRandomRoleDelay);
-        }
-    }
+    // // auto-run 'rrc' command
+    // async function autoRunLoop() {
+    //     while (globalData.enableRRCLoop == 1) {
+    //         autoRunCommand();
+    //         await sleep(globalData.autoRandomRoleDelay);
+    //     }
+    // }
 
-    await autoRunLoop();
+    //await autoRunLoop();
     });
 
 async function autoUpdate() {
@@ -149,4 +193,20 @@ app.listen(port, () => {
     console.log(`🔗 Listening : http://localhost:${port}`);
 });
 
+// This will update the voice state of the player.
+client.on("raw", (d) => {
+    if (
+        ![
+            GatewayDispatchEvents.VoiceStateUpdate,
+            GatewayDispatchEvents.VoiceServerUpdate,
+        ].includes(d.t)
+    )
+        return;
+    client.riffy.updateVoiceState(d);
+});
+
 client.login(process.env.TOKEN);
+
+module.exports = {
+    client
+}

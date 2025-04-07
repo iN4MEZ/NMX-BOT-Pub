@@ -1,6 +1,8 @@
 module.exports = {
-    autoRandomRoleDelay: 600000,
+    autoRandomRoleDelay: 7200000,
     sendImagePerDelay: 5000,
     enableLog: 0,
-    enableRRCLoop: 1
+    enableRRCLoop: 1,
+    randomColorRoleIds: ['791983287345086467', '756104816299868180', '1357078575584514268', '1357099208909521006', '1357099303755059210', '1357099791636758618'],
+    uniqueRoleIds: ['1357078575584514268', '1357099208909521006', '1357099303755059210', '1357099791636758618']
 }
