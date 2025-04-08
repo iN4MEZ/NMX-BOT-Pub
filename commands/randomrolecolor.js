@@ -1,18 +1,22 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('@discordjs/builders');
+const { PermissionFlagsBits  }=  require("discord.js");
+
+const globalData = require('../global/data');
 
 require('dotenv').config();
 
 const data = new SlashCommandBuilder()
     .setName('rrc')
-    .setDescription('randomize the role color');
+    .setDescription('randomize the role color')
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 
 module.exports = {
     data,
     async execute({ client, interaction }) {
 
-        const roleIds = ['791983287345086467', '756104816299868180', '1357078575584514268', '1357099208909521006', '1357099303755059210', '1357099791636758618'];
+        const roleIds = globalData.randomColorRoleIds;
 
-        const uniqueRoleId = ['1357078575584514268', '1357099208909521006', '1357099303755059210', '1357099791636758618'];
+        const uniqueRoleId = globalData.uniqueRoleIds;
 
         const guild = client.guilds.cache.get(process.env.GUILD_ID);
         if (!guild) {

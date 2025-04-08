@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder,ButtonBuilder ,ActionRowBuilder ,ButtonStyle , PermissionFlagsBits } = require('discord.js');
 const musicIcons = require('../assets/UI/icons/musicicons');
 const cmdIcons = require('../assets/UI/icons/commandicons');
 // const { autoplayCollection } = require('../../mongodb');
@@ -154,7 +154,7 @@ module.exports = {
                         .setDescription('Volume level (0-100).')
                         .setRequired(true))),
 
-    async execute({client,interaction}) {
+    async execute({ client, interaction }) {
         if (interaction.isCommand && interaction.isCommand()) {
             await interaction.deferReply();
 
@@ -233,9 +233,20 @@ module.exports = {
                             .setFooter({ text: 'Now playing', iconURL: musicIcons.footerIcon })
                             .setDescription(`🎵 Added **${track.info.title}** to the queue.`);
 
-                        await interaction.editReply({ embeds: [trackEmbed] });
+                        const pauseBtn = new ButtonBuilder().setCustomId('pause').setLabel("Pause").setStyle(ButtonStyle.Secondary);
 
-                        if (!player.playing && !player.paused) console.log("Music is Play"); player.play();
+                        const skipBtn = new ButtonBuilder().setCustomId('skip').setLabel("Skip").setStyle(ButtonStyle.Secondary);
+
+                        const loopBtn = new ButtonBuilder().setCustomId('loop').setLabel("Loop").setStyle(ButtonStyle.Secondary);
+
+                        const row = new ActionRowBuilder()
+                            .addComponents(pauseBtn)
+                            .addComponents(skipBtn)
+                            .addComponents(loopBtn);
+
+                        await interaction.editReply({ embeds: [trackEmbed], components: [row] });
+
+                        if (!player.playing && !player.paused) player.play();
                     }
 
                 } catch (error) {
@@ -487,7 +498,7 @@ module.exports = {
                 .setAuthor({
                     name: "Alert!",
                     iconURL: cmdIcons.dotIcon,
-                    url: "https://discord.gg/xQF9f9yUEM"
+                    url: "https://discord.gg/pNSh49KHUX"
                 })
                 .setDescription('- This command can only be used through slash commands!\n- Please use `/music`')
                 .setTimestamp();
