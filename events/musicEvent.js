@@ -26,7 +26,7 @@ module.exports = {
             });
 
             client.riffy.init(client.user.id);
-            console.log(`riffy was init!`);
+            console.log(`✅ riffy was init!`);
 
             client.riffy.on('nodeConnect', (node) => {
                 console.log(`\x1b[34m[ LAVALINK CONNECTION ]\x1b[0m Node connected: \x1b[32m${node.name}\x1b[0m`);
@@ -43,7 +43,7 @@ module.exports = {
                 if (player.currentMessageId) {
 
                     try {
-                        const oldMessage = await channel.messages.fetch(player.currentMessageId,{limit: 3});
+                        const oldMessage = await channel.messages.fetch(player.currentMessageId);
                         if (oldMessage) {
                             const disabledComponents = oldMessage.components.map(row => {
                                 return new ActionRowBuilder().addComponents(

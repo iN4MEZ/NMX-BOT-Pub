@@ -1,5 +1,6 @@
 const fs = require('fs');
-const path = require('node:path');
+
+const globalData = require('../global/data');
 
 module.exports = {
     name: 'interactionCreate',

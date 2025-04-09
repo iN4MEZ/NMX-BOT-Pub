@@ -6,6 +6,9 @@ const { GatewayIntentBits, Client, GatewayDispatchEvents } = require('discord.js
 
 const { setTimeout: sleep } = require('timers/promises');
 
+const { CharacterAI } = require('node_characterai');
+const characterAI = new CharacterAI();
+
 const fs = require('fs');
 const path = require('node:path');
 
@@ -25,6 +28,10 @@ const client = new Client({
         GatewayIntentBits.GuildVoiceStates
     ]
 });
+
+// Global Vars
+client.activeChat = []; // เปลี่ยนให้เป็น Array
+client.activeCharacter = globalData.characterAI_id; // default character chat ID
 
 
 // โหลด Event อัตโนมัติ
@@ -65,6 +72,8 @@ client.once('ready', async () => {
 
     await autoUpdate();
 
+    console.log("✅ Connected With C.AI");
+
     console.log("✅ Bot is ready Login with " + client.user.username);
 
     // auto-run 'rrc' command
@@ -76,6 +85,10 @@ client.once('ready', async () => {
     }
 
     await autoRunLoop();
+
+    if(globalData.enableCharacterAI_API === 0) { return; }
+
+    characterAI.authenticate(process.env.CAI_TOKEN); // Initial authentication on startup
 });
 
 async function autoUpdate() {
@@ -148,5 +161,5 @@ app.listen(port, () => {
 client.login(process.env.TOKEN);
 
 module.exports = {
-    client, commands
+    client, commands,characterAI
 }
