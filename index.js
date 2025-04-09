@@ -35,7 +35,7 @@ for (const file of eventFiles) {
     const filePath = path.join(eventsPath, file);
     const event = require(filePath);
 
-        // 🔹 ดึงชื่อไฟล์
+    // 🔹 ดึงชื่อไฟล์
     const fileNameNoExt = path.parse(filePath).name;     // เช่น 'ready'
 
     console.log(`Loaded event file: ${fileNameNoExt}`);
@@ -148,5 +148,5 @@ app.listen(port, () => {
 client.login(process.env.TOKEN);
 
 module.exports = {
-    client,commands
+    client, commands
 }
