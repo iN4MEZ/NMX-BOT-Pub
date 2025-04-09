@@ -235,10 +235,6 @@ module.exports = {
 
                         await interaction.editReply({ embeds: [trackEmbed] });
 
-                        module.exports = {
-                            interaction
-                        }
-
                         if (!player.playing && !player.paused) player.play();
                     }
 

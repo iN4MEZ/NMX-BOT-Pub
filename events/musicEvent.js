@@ -38,7 +38,10 @@ module.exports = {
 
             client.riffy.on('trackStart', async (player, track) => {
 
+                const channel = client.channels.cache.get(player.textChannel);
+
                 if (player.currentMessageId) {
+
                     try {
                         const oldMessage = await channel.messages.fetch(player.currentMessageId,{limit: 3});
                         if (oldMessage) {
@@ -53,9 +56,6 @@ module.exports = {
                         console.warn("Previous message not found (likely deleted), skipping edit.");
                     }
                 }
-
-                const interaction = require('../commands/playmusic').interaction;
-
                 let components = [];
 
                 if (track.requester && track.requester.id) {
@@ -77,7 +77,7 @@ module.exports = {
 
                     components = [buttonsRow, buttonsRow2];
 
-                    await interaction.editReply({ components: components });
+                    await channel.send({ components: components });
                 }
             });
 
