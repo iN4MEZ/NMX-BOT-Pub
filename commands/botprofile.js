@@ -53,16 +53,7 @@ module.exports = {
                     break;
 
             }
-
-            async function changeBanner() {
-                await client.rest.patch(Routes.user(), {
-                    body: { banner: imageBuffer }
-                }).catch(err => {
-                    interaction.editReply("❌ " + err);
-                });
-
-            }
-
+            
             async function sendMessage(message) {
                 await interaction.editReply(message);  
             }

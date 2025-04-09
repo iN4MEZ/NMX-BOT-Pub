@@ -4,11 +4,6 @@ const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const { GatewayIntentBits, Client, GatewayDispatchEvents } = require('discord.js');
 
-const { DisTube } = require('distube');
-const { YtDlpPlugin } = require('@distube/yt-dlp');
-
-const { Riffy } = require('riffy');
-
 const { setTimeout: sleep } = require('timers/promises');
 
 const fs = require('fs');
@@ -31,44 +26,6 @@ const client = new Client({
     ]
 });
 
-client.distube = new DisTube(client, {
-    plugins: [
-        new YtDlpPlugin(),
-    ],
-});
-
-console.log('\x1b[35m[ MUSIC 1 ]\x1b[0m', '\x1b[32mDisTube Music System Active ✅\x1b[0m');
-
-const nodes = [
-    {
-        host: "ind1.zapto.org",
-        password: "yourpasswordhere",
-        port: 25575,
-        secure: false
-    }
-];
-
-client.riffy = new Riffy(client, nodes, {
-    send: (payload) => {
-        const guild = client.guilds.cache.get(payload.d.guild_id);
-        if (guild) guild.shard.send(payload);
-    },
-    defaultSearchPlatform: "ytmsearch",
-    restVersion: "v4", // Or "v3" based on your Lavalink version.
-});
-
-client.on("ready", () => {
-    client.riffy.init(client.user.id);
-    console.log(`riffy was init!`);
-});
-
-client.riffy.on('nodeConnect', (node) => {
-    console.log(`\x1b[34m[ LAVALINK CONNECTION ]\x1b[0m Node connected: \x1b[32m${node.name}\x1b[0m`);
-});
-
-client.riffy.on('nodeError', (node, error) => {
-    console.error(`\x1b[31m[ LAVALINK ]\x1b[0m Node \x1b[32m${node.name}\x1b[0m had an error: \x1b[33m${error.message}\x1b[0m`);
-});
 
 // โหลด Event อัตโนมัติ
 const eventsPath = path.join(__dirname, 'events');
@@ -77,6 +34,12 @@ const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'
 for (const file of eventFiles) {
     const filePath = path.join(eventsPath, file);
     const event = require(filePath);
+
+        // 🔹 ดึงชื่อไฟล์
+    const fileNameNoExt = path.parse(filePath).name;     // เช่น 'ready'
+
+    console.log(`Loaded event file: ${fileNameNoExt}`);
+
     if (event.once) {
         client.once(event.name, (...args) => event.execute(...args, client));
     } else {
@@ -144,45 +107,6 @@ async function autoRunCommand() {
 client.on('interactionCreate', async (interaction) => {
     try {
 
-
-        // 🎯 Autocomplete
-        if (interaction.isAutocomplete() && interaction.commandName === "search") {
-            const focused = interaction.options.getFocused()?.toLowerCase() || '';
-
-            const creatorCache = JSON.parse(fs.readFileSync('./assets/data/artists.json'));
-
-            const filtered = creatorCache.filter(artist =>
-                artist.name.toLowerCase().startsWith(focused)
-            ).slice(0, 10);
-
-            const results = filtered.map(artist => ({
-                name: `${artist.name} ${artist.service}`,
-                value: artist.id
-            }));
-
-            return interaction.respond(results).catch(() => { });
-        }
-
-        if (interaction.isAutocomplete() && interaction.commandName === "setglobalparameter") {
-            const focused = interaction.options.getFocused()?.toLowerCase() || '';
-
-            const mode = {
-                modeList: Object.keys(globalData)
-            }
-
-            const filtered = mode.modeList.filter(target =>
-                target.toLowerCase().startsWith(focused)
-            ).slice(0, mode.modeList.length);
-
-
-            const results = filtered.map(mode => ({
-                name: `${mode}`,
-                value: mode
-            }));
-
-            return interaction.respond(results).catch(() => { });
-        }
-
         // ✅ Slash command
         if (interaction.isCommand()) {
             const command = commands.find(cmd => cmd.data.name === interaction.commandName);
@@ -208,46 +132,6 @@ client.on("raw", (d) => {
     client.riffy.updateVoiceState(d);
 });
 
-client.on('interactionCreate', async interaction => {
-    if (!interaction.isButton()) return;
-
-    const command = commands.find(cmd => cmd.data.name === "music");
-    if (!command) return; // Exit if no command found
-
-    const player = client.riffy.players.get(interaction.guild.id);
-
-    // Handle pause button
-    if (interaction.customId === 'pause') {
-        if (player) {
-            player.paused = !player.paused;
-            player.pause(player.paused); // Toggle pause state
-            await interaction.reply({
-                content: `Music is now ${player.paused ? 'paused' : 'playing'}.`,
-                ephemeral: true
-            });
-        }
-    }
-
-    // Handle skip button
-    if (interaction.customId === 'skip') {
-        if (player) {
-            player.stop();
-            await interaction.reply({
-                content: `Song skipped.`,
-                ephemeral: true
-            });
-        }
-    }
-
-    // Handle loop button (can add more functionality later)
-    if (interaction.customId === 'loop') {
-        await interaction.reply({
-            content: `Loop functionality is not implemented yet.`,
-            ephemeral: true
-        });
-    }
-});
-
 client.on('error', (e) => console.error("Client Error:", e));
 
 const express = require("express");
@@ -264,5 +148,5 @@ app.listen(port, () => {
 client.login(process.env.TOKEN);
 
 module.exports = {
-    client
+    client,commands
 }

@@ -233,18 +233,11 @@ module.exports = {
                             .setFooter({ text: 'Now playing', iconURL: musicIcons.footerIcon })
                             .setDescription(`🎵 Added **${track.info.title}** to the queue.`);
 
-                        const pauseBtn = new ButtonBuilder().setCustomId('pause').setLabel("Pause").setStyle(ButtonStyle.Secondary);
+                        await interaction.editReply({ embeds: [trackEmbed] });
 
-                        const skipBtn = new ButtonBuilder().setCustomId('skip').setLabel("Skip").setStyle(ButtonStyle.Secondary);
-
-                        const loopBtn = new ButtonBuilder().setCustomId('loop').setLabel("Loop").setStyle(ButtonStyle.Secondary);
-
-                        const row = new ActionRowBuilder()
-                            .addComponents(pauseBtn)
-                            .addComponents(skipBtn)
-                            .addComponents(loopBtn);
-
-                        await interaction.editReply({ embeds: [trackEmbed], components: [row] });
+                        module.exports = {
+                            interaction
+                        }
 
                         if (!player.playing && !player.paused) player.play();
                     }
