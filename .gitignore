@@ -1,0 +1,11 @@
+.env
+.env.example
+.env.local
+.env.staging
+update.bat
+run.bat
+assets/data/artists.json
+/node_modules
+/disabled
+/old
+/languages

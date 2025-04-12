@@ -1,0 +1,14 @@
+module.exports = {
+    autoRandomRoleDelay: 14400000,
+    sendImagePerDelay: 5000,
+    enableLog: 0,
+    enableRRCLoop: 1,
+    enableCharacterAI_API: 1,
+    enableCharacterAI_Message_TTS:0,
+    enableCharacterAI_Voice_TTS:0,
+    enableExperimental_AUTOMESSAGE: 0,
+    randomColorRoleIds: ['791983287345086467', '756104816299868180', '1357078575584514268', '1357099208909521006', '1357099303755059210', '1357099791636758618'],
+    uniqueRoleIds: ['1357078575584514268', '1357099208909521006', '1357099303755059210', '1357099791636758618'],
+    characterAI_id: "ZMV1tDc-Nb759VKRquSf0gC51JkseH63E5HhFRcXRaM",
+    characterAI_VoiceId: "51ca37c7-76f4-4723-bec1-cfc178992a00"
+}
