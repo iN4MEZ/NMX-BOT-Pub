@@ -12,6 +12,8 @@ const path = require('node:path');
 
 const globalData = require('./global/data');
 
+const runCommand = require('./utils/run-command').runCommand;
+
 const commands = [];
 const commandsData = [];
 
@@ -66,6 +68,8 @@ client.once('ready', async () => {
         Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
         { body: commandsData }
     );
+
+    await runCommand('updatelowprofile');
 
     console.log("✅ Bot is ready Login with " + client.user.username);
 

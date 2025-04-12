@@ -3,6 +3,8 @@ const fs = require('fs');
 
 const fetchArtist = require('../utils/fetch-utils');
 
+const path = require('path');
+
 const data = new SlashCommandBuilder()
     .setName('updatelowprofile')
     .setDescription('update data with low ram')
@@ -13,6 +15,15 @@ module.exports = {
         await updateCreatorData();
         async function updateCreatorData() {
             try {
+
+                const dir = path.join(__dirname,'..', 'assets', 'data');
+
+                // สร้างโฟลเดอร์
+                fs.mkdir(dir, { recursive: true }, (err) => {
+                    if (err) console.error(err);
+                    else console.log('✅ Directory created!');
+                  });
+
                 creator = await fetchArtist.fetchArtistDataMinimal();
                 creator = creator.map(({ name, id, service }) => ({ name, id, service }));
 

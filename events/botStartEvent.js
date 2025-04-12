@@ -9,8 +9,6 @@ module.exports = {
     once: false,
     async execute(client) {
         
-        await runCommand('updatelowprofile');
-        
         await autoRunLoop();
 
         // auto-run 'rrc' command
