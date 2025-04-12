@@ -1,8 +1,12 @@
 require('dotenv').config();
 
 const { AttachmentBuilder } = require('discord.js');
+const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus, entersState, VoiceConnectionStatus } = require('@discordjs/voice');
 
 const axios = require('axios');
+
+const fs = require('fs');
+const path = require('node:path');
 
 const globalData = require('../global/data');
 
@@ -11,7 +15,7 @@ module.exports = {
     once: false,
     async execute(message) {
 
-        if(globalData.enableCharacterAI_API === 0) {return; }
+        if (globalData.enableCharacterAI_API === 0) { return; }
 
 
         // If the code retrieves a message from a bot user, it stops te code. (Remove if you want the bot to interact with other bots)
@@ -31,7 +35,9 @@ module.exports = {
 
             // เริ่มแชทใหม่
             client.activeChat.push(`${message.channel.id}_${message.author.id}`);
-            msgText = message.content.split(" ").slice(1).join(" ");
+            const args = message.content.split(" ").slice(1);
+            const filteredArgs = args.filter(arg => !arg.startsWith("<@") && !arg.startsWith("<@!"));
+            msgText = filteredArgs.join(" ");
         }
 
         // ตรวจสอบว่าแชทนี้ยังคงอยู่หรือไม่
@@ -42,17 +48,105 @@ module.exports = {
 
         // If no token its not auth'd
         if (!characterAI?.token) await characterAI.authenticate(process.env.CAI_TOKEN); // Authenticate again if the auth has timed out
-        const character = await characterAI.fetchCharacter(client.activeCharacter); // Get character by charID
+        const character = await characterAI.fetchCharacter(globalData.characterAI_id); // Get character by charID
 
         const dm = await character.DM(); // Get the main conversation of the character;
 
+        const voiceChannel = message.member?.voice?.channel;
+
         const aiReponse = await dm.sendMessage(msgText);
+
+        await message.reply(aiReponse.content);
 
         const ttsMessage = await aiReponse.getTTSUrl(globalData.characterAI_VoiceId);
 
         const mp3Url = ttsMessage; // แทนด้วย URL ของ mp3 ที่ต้องการส่ง
 
-        await message.reply(aiReponse.content);
+        const guildId = message.guild.id;
+
+        if (globalData.enableCharacterAI_Voice_TTS === 1) {
+            const queues = new Map(); // ใช้เก็บคิวตาม guild
+
+            // ถ้ายังไม่มีคิวของ guild นี้ ให้สร้างใหม่
+            if (!queues.has(guildId)) {
+                queues.set(guildId, {
+                    queue: [],
+                    playing: false,
+                    connection: null,
+                    player: createAudioPlayer(),
+                });
+            }
+
+            const queueObj = queues.get(guildId);
+            queueObj.queue.push({ url: mp3Url, voiceChannel });
+
+            // เข้าห้องเสียงถ้ายังไม่ได้เข้าหรือโดนตัด
+            if (
+                !queueObj.connection ||
+                queueObj.connection.state.status === VoiceConnectionStatus.Destroyed
+            ) {
+                queueObj.connection = joinVoiceChannel({
+                    channelId: voiceChannel.id,
+                    guildId,
+                    adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+                });
+
+                try {
+                    await entersState(queueObj.connection, VoiceConnectionStatus.Ready, 10_000);
+                    queueObj.connection.subscribe(queueObj.player);
+                } catch (err) {
+                    console.error('❌ Failed to connect to voice channel:', err);
+                    return;
+                }
+            }
+
+            if (!queueObj.playing) {
+                playNextInQueue(guildId, message);
+            }
+
+            async function playNextInQueue(guildId) {
+                const queueObj = queues.get(guildId);
+                const next = queueObj.queue.shift();
+
+                if (!next) {
+                    // ไม่มีเพลงตอนนี้ แต่ยังไม่ destroy connection
+                    queueObj.playing = false;
+                    return;
+                }
+
+                queueObj.playing = true;
+
+                try {
+                    // ดาวน์โหลดไฟล์
+                    const response = await axios.get(next.url, { responseType: 'stream' });
+                    const filePath = path.join(__dirname, `${guildId}_temp.mp3`);
+                    const writer = fs.createWriteStream(filePath);
+
+                    // use axios to write stream
+                    response.data.pipe(writer);
+                    await new Promise((resolve, reject) => {
+                        writer.on('finish', resolve);
+                        writer.on('error', reject);
+                    });
+
+                    // create audio reasources
+                    const resource = createAudioResource(filePath);
+                    queueObj.player.play(resource);
+
+                    queueObj.player.once(AudioPlayerStatus.Idle, () => {
+                        fs.unlink(filePath, () => { });
+                        playNextInQueue(guildId); // เล่นเพลงถัดไป
+                    });
+
+                } catch (err) {
+                    console.error('❌ Error playing file:', err);
+                    queueObj.playing = false;
+                    playNextInQueue(guildId); // ข้ามเพลงที่ error แล้วไปต่อ
+                }
+            }
+        }
+
+        if (globalData.enableCharacterAI_Message_TTS === 0) { return; }
 
         try {
             const response = await axios.get(mp3Url, { responseType: 'arraybuffer' });

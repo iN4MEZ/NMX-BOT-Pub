@@ -31,7 +31,6 @@ const client = new Client({
 
 // Global Vars
 client.activeChat = []; // เปลี่ยนให้เป็น Array
-client.activeCharacter = globalData.characterAI_id; // default character chat ID
 
 
 // โหลด Event อัตโนมัติ
@@ -45,7 +44,7 @@ for (const file of eventFiles) {
     // 🔹 ดึงชื่อไฟล์
     const fileNameNoExt = path.parse(filePath).name;     // เช่น 'ready'
 
-    console.log(`Loaded event file: ${fileNameNoExt}`);
+    console.log(`Loaded event: ${fileNameNoExt}`);
 
     if (event.once) {
         client.once(event.name, (...args) => event.execute(...args, client));
@@ -70,52 +69,60 @@ client.once('ready', async () => {
         { body: commandsData }
     );
 
-    await autoUpdate();
-
-    console.log("✅ Connected With C.AI");
+    await autoRunLoop();
 
     console.log("✅ Bot is ready Login with " + client.user.username);
 
     // auto-run 'rrc' command
     async function autoRunLoop() {
         while (globalData.enableRRCLoop == 1) {
-            autoRunCommand();
+            runCommand('rrc').then(async ()=> {
+                if (globalData.enableLog === 1) {
+
+                    const channel = await client.channels.fetch('1358228500737298584');
+                    if (!channel) return;
+        
+                    const now = new Date(Date.now() + 7 * 60 * 60 * 1000);
+                    await channel.send(`Automatic Randomize Role ${now.toUTCString()} Delay: ${globalData.autoRandomRoleDelay}`);
+                }
+            }).catch((err) => console.log('❌ Random role color error: ' + err));
             await sleep(globalData.autoRandomRoleDelay);
         }
     }
 
-    await autoRunLoop();
-
     if(globalData.enableCharacterAI_API === 0) { return; }
 
     characterAI.authenticate(process.env.CAI_TOKEN); // Initial authentication on startup
+
+    console.log("✅ Connected With C.AI");
 });
 
-async function autoUpdate() {
-    const command = commands.find(cmd => cmd.data.name === 'updatelowprofile');
-    if (!command) return;
+async function runCommand(commandName) {
+    return new Promise(async (resolve, reject) => {
+        const command = commands.find(cmd => cmd.data.name === commandName);
+        if (!command) return reject(new Error("Command not found"));
 
-    await command.execute({ client, interaction: null });
-}
-
-async function autoRunCommand() {
-    try {
-        const command = commands.find(cmd => cmd.data.name === 'rrc');
-        if (!command) return;
-
-        const channel = await client.channels.fetch('1358228500737298584');
-        if (!channel) return;
-
-        await command.execute({ client, interaction: null });
-
-        if (globalData.enableLog === 1) {
-            const now = new Date(Date.now() + 7 * 60 * 60 * 1000);
-            await channel.send(`Automatic Randomize Role ${now.toUTCString()} Delay: ${globalData.autoRandomRoleDelay}`);
+        try {
+            const result = await command.execute({ client, interaction: null });
+            resolve(result);
+        } catch (err) {
+            reject(err);
         }
-    } catch (err) {
-        console.error("❌ Auto command error:", err);
-    }
+    });
 }
+
+client.on('ready',async ()=> {
+    await runCommand('updatelowprofile');
+
+    if(globalData.enableExperimental_AUTOMESSAGE === 1) {
+        while (true) {
+            await runCommand('autodm').then(async ()=> { 
+    
+            }).catch(err => console.log(err));
+            await sleep(60000);
+        }
+    }
+})
 
 client.on('interactionCreate', async (interaction) => {
     try {
