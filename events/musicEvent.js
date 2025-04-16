@@ -1,6 +1,9 @@
 const { Riffy } = require('riffy');
 
 const { dynamicCard } = require("../assets/UI/dynamicCard");
+const musicIcons = require('../assets/UI/icons/musicicons');
+
+const path = require('node:path');
 
 const { ButtonBuilder,EmbedBuilder, ActionRowBuilder, ButtonStyle,AttachmentBuilder } = require('discord.js');
 
@@ -11,9 +14,10 @@ module.exports = {
 
             const nodes = [
                 {
-                    host: "ind1.zapto.org",
-                    password: "yourpasswordhere",
-                    port: 25575,
+                    identifier: "Avinan",
+                    host: "new-york-node-1.vortexcloud.xyz",
+                    password: "avinan",
+                    port: 5008,
                     secure: false
                 }
             ];
@@ -57,7 +61,7 @@ module.exports = {
                         songTitle: track.info.title,
                         songArtist: track.info.author,
                         trackRequester: track.requester ? track.requester.username : "All In One",
-                        fontPath: path.join(__dirname, "../UI", "fonts", "AfacadFlux-Regular.ttf"),
+                        fontPath: path.join(__dirname, "../assets/UI", "fonts", "AfacadFlux-Regular.ttf"),
                         backgroundColor: "#FF00FF",
                     });
             
