@@ -3,7 +3,7 @@ module.exports = {
     sendImagePerDelay: 5000,
     enableLog: 0,
     enableRRCLoop: 1,
-    enableCharacterAI_API: 1,
+    enableCharacterAI_API: 0,
     enableCharacterAI_Message_TTS:0,
     enableCharacterAI_Voice_TTS:0,
     enableExperimental_AUTOMESSAGE: 0,
