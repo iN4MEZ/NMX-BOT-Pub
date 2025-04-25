@@ -3,9 +3,11 @@ const { Riffy } = require('riffy');
 const { dynamicCard } = require("../assets/UI/dynamicCard");
 const musicIcons = require('../assets/UI/icons/musicicons');
 
+const globalData = require('../global/data');
+
 const path = require('node:path');
 
-const { ButtonBuilder,EmbedBuilder, ActionRowBuilder, ButtonStyle,AttachmentBuilder } = require('discord.js');
+const { ButtonBuilder, EmbedBuilder, ActionRowBuilder, ButtonStyle, AttachmentBuilder } = require('discord.js');
 
 module.exports = {
     name: 'ready',
@@ -14,11 +16,10 @@ module.exports = {
 
             const nodes = [
                 {
-                    identifier: "Avinan",
-                    host: "new-york-node-1.vortexcloud.xyz",
-                    password: "avinan",
-                    port: 5008,
-                    secure: false
+                    host: globalData.host,
+                    password: globalData.password,
+                    port: globalData.port,
+                    secure: globalData.secure,
                 }
             ];
 
@@ -64,18 +65,18 @@ module.exports = {
                         fontPath: path.join(__dirname, "../assets/UI", "fonts", "AfacadFlux-Regular.ttf"),
                         backgroundColor: "#FF00FF",
                     });
-            
+
                     const attachment = new AttachmentBuilder(cardImage, { name: 'songcard.png' });
-            
-                    const description = `- Title: ${track.info.title} \n`+
-                    ` - Artist: ${track.info.author} \n`+
-                    ` - Length: ${formatTime(track.info.length)} (\`${track.info.length}ms\`) \n`+
-                    ` - Stream: ${track.info.stream ? "Yes" : "No"} \n`+
-                    ` - Seekable: ${track.info.seekable ? "Yes" : "No"} \n`+
-                    ` - URI: [Link](${track.info.uri}) \n`+
-                    ` - Source: ${track.info.sourceName} \n`+ 
-                    ` - Requested by: ${track.requester ? `<@${track.requester.id}>` : "Unknown"}`; 
-                    
+
+                    const description = `- Title: ${track.info.title} \n` +
+                        ` - Artist: ${track.info.author} \n` +
+                        ` - Length: ${formatTime(track.info.length)} (\`${track.info.length}ms\`) \n` +
+                        ` - Stream: ${track.info.stream ? "Yes" : "No"} \n` +
+                        ` - Seekable: ${track.info.seekable ? "Yes" : "No"} \n` +
+                        ` - URI: [Link](${track.info.uri}) \n` +
+                        ` - Source: ${track.info.sourceName} \n` +
+                        ` - Requested by: ${track.requester ? `<@${track.requester.id}>` : "Unknown"}`;
+
                     const embed = new EmbedBuilder()
                         .setAuthor({ name: "Now Playing..", iconURL: musicIcons.playerIcon })
                         .setDescription(description)
@@ -84,8 +85,8 @@ module.exports = {
                         .setColor('#00c3ff');
 
 
-                        await channel.send({ embeds: [embed], });
-                } catch(err) {
+                    await channel.send({ embeds: [embed], });
+                } catch (err) {
                     console.log(err);
                 }
 
@@ -134,7 +135,7 @@ module.exports = {
                 const channel = client.channels.cache.get(player.textChannel);
                 if (player.currentMessageId) {
                     try {
-                        const oldMessage = await channel.messages.fetch(player.currentMessageId,{limit: 3});
+                        const oldMessage = await channel.messages.fetch(player.currentMessageId, { limit: 3 });
                         if (oldMessage) await oldMessage.delete();
                     } catch (err) {
                         console.error("Failed to delete finished song message:", err);
