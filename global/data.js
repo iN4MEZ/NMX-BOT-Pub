@@ -11,8 +11,10 @@ module.exports = {
     uniqueRoleIds: ['1357078575584514268', '1357099208909521006', '1357099303755059210', '1357099791636758618'],
     characterAI_id: "ZMV1tDc-Nb759VKRquSf0gC51JkseH63E5HhFRcXRaM",
     characterAI_VoiceId: "51ca37c7-76f4-4723-bec1-cfc178992a00",
-    host: "lavahatry4.techbyte.host",
-    password: "NAIGLAVA-dash.techbyte.host",
-    port: 3000,
-    secure: false
+    lavalinknodes: [{
+        host: "lavahatry4.techbyte.host",
+        password: "NAIGLAVA-dash.techbyte.host",
+        port: 3000,
+        secure: false
+    }]
 }

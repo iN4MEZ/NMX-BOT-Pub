@@ -71,6 +71,8 @@ client.once('ready', async () => {
 
     await runCommand('updatelowprofile');
 
+    await runCommand('autoconnectlavalink');
+
     console.log("✅ Bot is ready Login with " + client.user.username);
 
     if(globalData.enableCharacterAI_API === 0) { return; }

@@ -14,16 +14,8 @@ module.exports = {
         try {
             await interaction.deferReply();
 
-            const nodes = [
-                {
-                    host: globalData.host,
-                    password: globalData.password,
-                    port: globalData.port,
-                    secure: globalData.secure,
-                }
-            ];
 
-            client.riffy = new Riffy(client, nodes, {
+            client.riffy = new Riffy(client, globalData.lavalinknodes, {
                 send: (payload) => {
                     const guild = client.guilds.cache.get(payload.d.guild_id);
                     if (guild) guild.shard.send(payload);
