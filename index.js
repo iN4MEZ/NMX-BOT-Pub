@@ -69,9 +69,9 @@ client.once('ready', async () => {
         { body: commandsData }
     );
 
-    await runCommand('updatelowprofile');
+    // await runCommand('updatelowprofile');
 
-    await runCommand('autoconnectlavalink');
+    // await runCommand('autoconnectlavalink');
 
     console.log("✅ Bot is ready Login with " + client.user.username);
 

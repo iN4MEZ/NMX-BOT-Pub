@@ -28,35 +28,40 @@ module.exports = {
       secure: node.secure,
     }));
 
-    let avialableNodes = [];
-    for (const node of nodes) {
+    const statusPromises = nodes.map(async (node) => {
       try {
-        const res = await axios.get(`https://lavalink-list-api.ajieblogs.eu.org/${node.unique_id}/badge/Status`);
-        const svgOutput = res.data;
+      const res = await axios.get(`https://lavalink-list-api.ajieblogs.eu.org/${node.unique_id}/badge/Status`);
+      const svgOutput = res.data;
 
-        // Extract the status using a regular expression
-        const match = svgOutput.match(/>🔴 Offline<|>🟢 Online</);
+      // Extract the status using a regular expression
+      const match = svgOutput.match(/>🔴 Offline<|>🟢 Online</);
 
-        if (match) {
-          const status = match[0].replace(/[><🔴🟢]/g, '').trim(); // "Offline" or "Online"
-
-          if (status === "Online") {
-            avialableNodes.push(node);
-          }
-        } else {
-          console.log("Status not found in SVG");
-        }
-      } catch (err) {
-        console.log(err);
+      if (match) {
+        const status = match[0].replace(/[><🔴🟢]/g, '').trim(); // "Offline" or "Online"
+        return status === "Online" ? node : null;
+      } else {
+        console.log("Status not found in SVG");
+        return null;
       }
+      } catch (err) {
+      console.log(err);
+      return null;
+      }
+    });
+
+    const resolvedNodes = await Promise.all(statusPromises);
+    const availableNodes = resolvedNodes.filter(node => node !== null);
+
+    if (availableNodes.length === 0) {
+      throw new Error("No available Lavalink nodes found.");
     }
 
-    globalData.lavalinknodes = avialableNodes[0];
+    globalData.lavalinknodes = availableNodes[0];
 
     client.riffy = new Riffy(client, [globalData.lavalinknodes], {
       send: (payload) => {
-        const guild = client.guilds.cache.get(payload.d.guild_id);
-        if (guild) guild.shard.send(payload);
+      const guild = client.guilds.cache.get(payload.d.guild_id);
+      if (guild) guild.shard.send(payload);
       },
       defaultSearchPlatform: "ytmsearch",
       restVersion: "v4", // Or "v3" based on your Lavalink version.
@@ -80,8 +85,6 @@ module.exports = {
         content: `Connected to lavalink server ${globalData.lavalinknodes.host} successfully!`,
       });
     }
-
-
   }
 
 }
